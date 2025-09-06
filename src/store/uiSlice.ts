@@ -76,7 +76,7 @@ const uiSlice = createSlice({
     },
     removeOptimisticAction: (state, action: PayloadAction<string>) => {
       state.optimisticActions = state.optimisticActions.filter(
-        action => action.id !== action.payload
+        optimisticAction => optimisticAction.id !== action.payload
       )
     },
     clearOptimisticActions: (state) => {

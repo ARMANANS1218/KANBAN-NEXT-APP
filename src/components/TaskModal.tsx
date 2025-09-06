@@ -208,7 +208,6 @@ export const TaskModal: React.FC<TaskModalProps> = ({
                   {...field}
                   id="title"
                   placeholder="Enter task title..."
-                  error={!!errors.title}
                 />
               )}
             />

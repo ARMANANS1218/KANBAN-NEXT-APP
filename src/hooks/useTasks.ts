@@ -84,9 +84,9 @@ export const useTasks = (boardId?: string) => {
 
       // Handle priority field
       if (field === 'priority') {
-        const priorityOrder = { low: 1, medium: 2, high: 3, urgent: 4 }
-        aValue = priorityOrder[aValue] || 0
-        bValue = priorityOrder[bValue] || 0
+        const priorityOrder: Record<string, number> = { low: 1, medium: 2, high: 3, urgent: 4 }
+        aValue = priorityOrder[aValue as string] || 0
+        bValue = priorityOrder[bValue as string] || 0
       }
 
       if (aValue < bValue) return direction === 'asc' ? -1 : 1
@@ -179,7 +179,7 @@ export const useTasks = (boardId?: string) => {
     const originalTask = tasks.find(t => t._id === taskData._id)
     if (!originalTask) return
 
-    const optimisticTask = { ...originalTask, ...taskData, updatedAt: new Date() }
+    const optimisticTask = { ...originalTask, ...taskData, updatedAt: new Date() } as Task
     const actionId = generateId()
 
     // Optimistic update

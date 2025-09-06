@@ -99,7 +99,6 @@ export const TaskCard = memo<TaskCardProps>(({ task, index, isDragDisabled = fal
               <span className="truncate">{formatRelativeTime(new Date(task.dueDate))}</span>
             </div>
           )}
-          )}
 
           {/* Footer */}
           <div className="flex items-center justify-between">

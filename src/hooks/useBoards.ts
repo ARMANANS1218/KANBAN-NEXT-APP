@@ -89,7 +89,7 @@ export const useBoards = () => {
     const originalBoard = boards.find(b => b._id === boardData._id)
     if (!originalBoard) return
 
-    const optimisticBoard = { ...originalBoard, ...boardData, updatedAt: new Date() }
+    const optimisticBoard = { ...originalBoard, ...boardData, updatedAt: new Date() } as Board
     const actionId = generateId()
 
     // Optimistic update

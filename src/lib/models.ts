@@ -22,8 +22,8 @@ const taskSchema = new Schema<Task>({
   },
   tags: [{ type: String }],
   assignees: [{ type: Schema.Types.ObjectId, ref: 'User' }],
-  columnId: { type: Schema.Types.ObjectId, ref: 'Column', required: true },
-  boardId: { type: Schema.Types.ObjectId, ref: 'Board', required: true },
+  columnId: { type: String, required: true },
+  boardId: { type: String, required: true },
   order: { type: Number, required: true, default: 0 },
   dueDate: { type: Date },
 }, {
@@ -35,7 +35,7 @@ const columnSchema = new Schema<Column>({
   title: { type: String, required: true },
   tasks: [{ type: Schema.Types.ObjectId, ref: 'Task' }],
   order: { type: Number, required: true, default: 0 },
-  boardId: { type: Schema.Types.ObjectId, ref: 'Board', required: true },
+  boardId: { type: String, required: true },
 }, {
   timestamps: true,
 })
@@ -46,7 +46,7 @@ const boardSchema = new Schema<Board>({
   description: { type: String },
   columns: [{ type: Schema.Types.ObjectId, ref: 'Column' }],
   members: [{ type: Schema.Types.ObjectId, ref: 'User' }],
-  owner: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+  owner: { type: String, required: true },
 }, {
   timestamps: true,
 })

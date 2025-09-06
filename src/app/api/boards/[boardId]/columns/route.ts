@@ -32,9 +32,7 @@ export async function POST(
     const newColumn = {
       _id: new (require('mongoose').Types.ObjectId)(),
       title,
-      tasks: [],
-      order: board.columns.length,
-      boardId,
+      position: board.columns.length,
       createdAt: new Date(),
       updatedAt: new Date(),
     }
