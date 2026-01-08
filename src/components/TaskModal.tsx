@@ -15,6 +15,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   DialogFooter,
 } from './ui/dialog'
 import { Button } from './ui/button'
@@ -192,6 +193,9 @@ export const TaskModal: React.FC<TaskModalProps> = ({
               </div>
             )}
           </DialogTitle>
+          <DialogDescription>
+            {isNewTask ? 'Fill in the details to create a new task.' : 'Update the task details below.'}
+          </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">

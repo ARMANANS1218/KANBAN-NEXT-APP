@@ -12,8 +12,8 @@ export async function GET(
     const { boardId } = params
     
     const tasks = await TaskModel.find({ boardId })
-      .populate('assignees', 'name email avatar color')
-      .sort({ order: 1, createdAt: 1 })
+      .populate('assignees', 'name email avatar color profileImage')
+      .sort({ position: 1, createdAt: 1 })
     
     return NextResponse.json({
       success: true,

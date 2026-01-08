@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useEffect, useCallback, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { DragDropContext, DropResult } from '@hello-pangea/dnd'
 import { Plus, Filter, Search, Settings, Moon, Sun, Monitor } from 'lucide-react'
 import { useTheme } from 'next-themes'
@@ -26,6 +27,7 @@ interface KanbanBoardProps {
 
 export const KanbanBoard: React.FC<KanbanBoardProps> = ({ boardId }) => {
   const dispatch = useAppDispatch()
+  const router = useRouter()
   const { theme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
   const [isAddColumnModalOpen, setIsAddColumnModalOpen] = useState(false)
@@ -72,6 +74,8 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ boardId }) => {
           loadTasks(boardId)
         } else {
           console.error(`Board with ID ${boardId} not found`)
+          toast.error('Board not found. Redirecting to boards list...')
+          setTimeout(() => router.push('/boards'), 2000)
         }
       } catch (error) {
         console.error('Error loading board data:', error)
@@ -131,7 +135,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ boardId }) => {
       assignees: [],
       columnId,
       boardId,
-      order: 0,
+      position: 0,
       createdAt: new Date(),
       updatedAt: new Date(),
     }

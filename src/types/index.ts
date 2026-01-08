@@ -3,6 +3,7 @@ export interface User {
   name: string;
   email: string;
   avatar?: string;
+  profileImage?: string;
   color: string;
   createdAt: Date;
   updatedAt: Date;
@@ -23,7 +24,7 @@ export interface Column {
   _id: string;
   title: string;
   tasks: Task[];
-  order: number;
+  position: number;
   boardId: string;
   createdAt: Date;
   updatedAt: Date;
@@ -38,8 +39,9 @@ export interface Task {
   assignees: User[];
   columnId: string;
   boardId: string;
-  order: number;
+  position: number;
   dueDate?: Date;
+  createdBy?: User;
   createdAt: Date;
   updatedAt: Date;
 }

@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useMemo } from 'react'
 import { Filter, X, Users, Tag, AlertTriangle } from 'lucide-react'
 import { useAppDispatch, useAppSelector } from '@/store'
 import { setFilterOptions, clearFilters } from '@/store/uiSlice'
@@ -14,14 +14,15 @@ export const SearchFilterBar: React.FC = () => {
   const users = useAppSelector(state => state.users.users)
   const [isFilterOpen, setIsFilterOpen] = useState(false)
 
-  // Get unique tags from all tasks
-  const allTags = useAppSelector(state => {
+  // Get unique tags from all tasks - memoized to avoid unnecessary rerenders
+  const tasks = useAppSelector(state => state.tasks.tasks)
+  const allTags = useMemo(() => {
     const uniqueTags = new Set<string>()
-    state.tasks.tasks.forEach(task => {
+    tasks.forEach(task => {
       task.tags.forEach(tag => uniqueTags.add(tag))
     })
     return Array.from(uniqueTags)
-  })
+  }, [tasks])
 
   const handleFilterChange = useCallback((updates: Partial<FilterOptions>) => {
     dispatch(setFilterOptions(updates))

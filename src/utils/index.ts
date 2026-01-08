@@ -73,6 +73,21 @@ export function generateAvatarUrl(name: string, color?: string): string {
   return `https://ui-avatars.com/api/?name=${encodeURIComponent(initials)}&background=${backgroundColor}&color=fff&size=40`
 }
 
+// Get user's profile image or avatar
+export function getUserImageSrc(user: { profileImage?: string; avatar?: string; name?: string }): string | null {
+  // Priority: profileImage > avatar name > null
+  if (user.profileImage) {
+    return user.profileImage
+  }
+  // If just avatar name, return null to show colored avatar circle instead
+  return null
+}
+
+// Check if user has uploaded a custom profile image
+export function hasCustomProfileImage(user: { profileImage?: string }): boolean {
+  return !!user.profileImage && user.profileImage.length > 0
+}
+
 export function debounce<T extends (...args: any[]) => any>(
   func: T,
   wait: number

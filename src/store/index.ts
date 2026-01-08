@@ -5,6 +5,7 @@ import boardsReducer from './boardsSlice'
 import tasksReducer from './tasksSlice'
 import usersReducer from './usersSlice'
 import uiReducer from './uiSlice'
+import authReducer from './authSlice'
 
 export const store = configureStore({
   reducer: {
@@ -12,11 +13,28 @@ export const store = configureStore({
     tasks: tasksReducer,
     users: usersReducer,
     ui: uiReducer,
+    auth: authReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
-        ignoredActions: ['persist/PERSIST'],
+        // Ignore these paths in the state
+        ignoredPaths: [
+          'tasks.tasks',
+          'ui.selectedTask',
+          'ui.optimisticActions',
+        ],
+        // Ignore these action types
+        ignoredActions: [
+          'persist/PERSIST',
+          'tasks/fetchTasks/fulfilled',
+          'tasks/createTask/fulfilled',
+          'tasks/updateTask/fulfilled',
+          'tasks/optimisticCreateTask',
+          'tasks/optimisticUpdateTask',
+          'ui/setSelectedTask',
+          'ui/addOptimisticAction',
+        ],
       },
     }),
 })

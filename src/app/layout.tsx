@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import { Providers } from './providers'
@@ -9,7 +9,14 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
   title: 'Kanban Board App',
   description: 'A modern, real-time Kanban board application built with Next.js 14',
-  viewport: 'width=device-width, initial-scale=1',
+  icons: {
+    icon: '/favicon.svg',
+  },
+}
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
 }
 
 export default function RootLayout({
@@ -18,7 +25,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning suppressContentEditableWarning>
       <body className={inter.className}>
         <Providers>
           {children}

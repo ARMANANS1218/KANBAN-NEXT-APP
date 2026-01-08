@@ -1,5 +1,6 @@
 'use client'
 
+import Navbar from '@/components/Navbar'
 import { KanbanBoard } from '@/components/KanbanBoard'
 
 interface BoardPageProps {
@@ -9,5 +10,10 @@ interface BoardPageProps {
 }
 
 export default function BoardPage({ params }: BoardPageProps) {
-  return <KanbanBoard boardId={params.boardId} />
+  return (
+    <div>
+      <Navbar />
+      <KanbanBoard boardId={params.boardId} />
+    </div>
+  )
 }

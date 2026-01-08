@@ -24,19 +24,44 @@ export const useSocket = (boardId?: string) => {
   useEffect(() => {
     if (!currentUser) return
 
+    const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3002'
+    console.log('Connecting to socket server at:', socketUrl)
+
     // Initialize socket connection
-    socketRef.current = io(process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3002', {
+    socketRef.current = io(socketUrl, {
       query: {
         userId: currentUser._id,
         boardId: boardId || '',
       },
+      reconnection: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000,
+      transports: ['websocket', 'polling'],
     })
 
     const socket = socketRef.current
 
+    // Connection event handlers
+    socket.on('connect', () => {
+      console.log('✅ Socket connected successfully!')
+    })
+
+    socket.on('connect_error', (error) => {
+      console.error('❌ Socket connection error:', error.message)
+    })
+
+    socket.on('disconnect', (reason) => {
+      console.warn('⚠️ Socket disconnected:', reason)
+    })
+
+    socket.on('reconnect', (attemptNumber) => {
+      console.log('🔄 Socket reconnected after', attemptNumber, 'attempts')
+    })
+
     // Join board room if boardId is provided
     if (boardId) {
       socket.emit('join-board', { boardId, userId: currentUser._id })
+      console.log('Joining board room:', boardId)
     }
 
     // Task events

@@ -25,7 +25,11 @@ export const UserAvatar = memo<UserAvatarProps>(({
     lg: 'h-12 w-12 text-base',
   }
 
-  const avatarUrl = user.avatar || generateAvatarUrl(user.name, user.color)
+  // Priority: profileImage > avatar > generated avatar
+  const hasProfileImage = user.profileImage && user.profileImage.length > 0
+  const avatarUrl = hasProfileImage 
+    ? user.profileImage 
+    : (user.avatar || generateAvatarUrl(user.name, user.color))
 
   return (
     <div className={cn('flex items-center gap-2', className)}>
@@ -38,7 +42,7 @@ export const UserAvatar = memo<UserAvatarProps>(({
         onClick={onClick}
         title={user.name}
       >
-        {user.avatar ? (
+        {hasProfileImage || user.avatar ? (
           <img
             src={avatarUrl}
             alt={user.name}
@@ -63,7 +67,7 @@ export const UserAvatar = memo<UserAvatarProps>(({
         <div
           className={cn(
             'absolute inset-0 flex items-center justify-center text-white font-medium',
-            user.avatar ? 'hidden' : ''
+            hasProfileImage || user.avatar ? 'hidden' : ''
           )}
           style={{ backgroundColor: user.color }}
         >

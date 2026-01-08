@@ -108,9 +108,9 @@ export const useTasks = (boardId?: string) => {
       grouped[task.columnId].push(task)
     })
 
-    // Sort tasks within each column by order
+    // Sort tasks within each column by position
     Object.keys(grouped).forEach(columnId => {
-      grouped[columnId].sort((a, b) => a.order - b.order)
+      grouped[columnId].sort((a, b) => a.position - b.position)
     })
 
     return grouped
@@ -135,7 +135,7 @@ export const useTasks = (boardId?: string) => {
       _id: optimisticId,
       ...taskData,
       assignees: [], // Will be populated after API call
-      order: Date.now(), // Temporary order
+      position: Date.now(), // Temporary position
       createdAt: new Date(),
       updatedAt: new Date(),
     }

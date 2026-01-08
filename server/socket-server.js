@@ -1,3 +1,4 @@
+require('dotenv').config()
 const { createServer } = require('http')
 const { Server } = require('socket.io')
 const mongoose = require('mongoose')
@@ -5,9 +6,11 @@ const mongoose = require('mongoose')
 // MongoDB connection
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/kanban-board'
 
+console.log('MongoDB URI:', MONGODB_URI.replace(/\/\/([^:]+):([^@]+)@/, '//$1:****@')) // Log URI without password
+
 mongoose.connect(MONGODB_URI)
-  .then(() => console.log('Connected to MongoDB'))
-  .catch(err => console.error('MongoDB connection error:', err))
+  .then(() => console.log('✅ Connected to MongoDB'))
+  .catch(err => console.error('❌ MongoDB connection error:', err.message))
 
 // Create HTTP server
 const httpServer = createServer()

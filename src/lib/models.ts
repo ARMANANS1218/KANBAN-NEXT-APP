@@ -23,19 +23,18 @@ const taskSchema = new Schema<Task>({
   tags: [{ type: String }],
   assignees: [{ type: Schema.Types.ObjectId, ref: 'User' }],
   columnId: { type: String, required: true },
-  boardId: { type: String, required: true },
-  order: { type: Number, required: true, default: 0 },
+  boardId: { type: Schema.Types.ObjectId, ref: 'Board', required: true },
+  position: { type: Number, required: true, default: 0 },
   dueDate: { type: Date },
+  createdBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
 }, {
   timestamps: true,
 })
 
-// Column Schema
-const columnSchema = new Schema<Column>({
+// Column Schema (for embedded documents in Board)
+const columnSchema = new Schema({
   title: { type: String, required: true },
-  tasks: [{ type: Schema.Types.ObjectId, ref: 'Task' }],
-  order: { type: Number, required: true, default: 0 },
-  boardId: { type: String, required: true },
+  position: { type: Number, required: true, default: 0 },
 }, {
   timestamps: true,
 })
@@ -44,23 +43,33 @@ const columnSchema = new Schema<Column>({
 const boardSchema = new Schema<Board>({
   title: { type: String, required: true },
   description: { type: String },
-  columns: [{ type: Schema.Types.ObjectId, ref: 'Column' }],
+  columns: [columnSchema], // Embedded subdocuments, not references
   members: [{ type: Schema.Types.ObjectId, ref: 'User' }],
-  owner: { type: String, required: true },
+  owner: { type: Schema.Types.ObjectId, ref: 'User', required: true },
 }, {
   timestamps: true,
 })
 
 // Add indexes for better performance
-taskSchema.index({ boardId: 1, columnId: 1, order: 1 })
+taskSchema.index({ boardId: 1, columnId: 1, position: 1 })
 taskSchema.index({ assignees: 1 })
 taskSchema.index({ tags: 1 })
-columnSchema.index({ boardId: 1, order: 1 })
+taskSchema.index({ createdBy: 1 })
 boardSchema.index({ owner: 1 })
 boardSchema.index({ members: 1 })
+
+// Force model recompilation
+if (models.Board) {
+  delete models.Board
+}
+if (models.User) {
+  delete models.User
+}
+if (models.Task) {
+  delete models.Task
+}
 
 // Export models
 export const UserModel = models.User || model<User>('User', userSchema)
 export const TaskModel = models.Task || model<Task>('Task', taskSchema)
-export const ColumnModel = models.Column || model<Column>('Column', columnSchema)
 export const BoardModel = models.Board || model<Board>('Board', boardSchema)

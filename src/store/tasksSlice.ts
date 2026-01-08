@@ -6,7 +6,12 @@ export const fetchTasks = createAsyncThunk(
   'tasks/fetchTasks',
   async (boardId: string, { rejectWithValue }) => {
     try {
-      const response = await fetch(`/api/boards/${boardId}/tasks`)
+      // Get token from localStorage
+      const token = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null
+      
+      const response = await fetch(`/api/tasks?boardId=${boardId}`, {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+      })
       const data: ApiResponse<Task[]> = await response.json()
       
       if (!data.success) {
@@ -24,9 +29,15 @@ export const createTask = createAsyncThunk(
   'tasks/createTask',
   async (taskData: CreateTaskData, { rejectWithValue }) => {
     try {
+      // Get token from localStorage
+      const token = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null
+      
       const response = await fetch('/api/tasks', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
         body: JSON.stringify(taskData),
       })
       
@@ -47,9 +58,15 @@ export const updateTask = createAsyncThunk(
   'tasks/updateTask',
   async (taskData: UpdateTaskData, { rejectWithValue }) => {
     try {
+      // Get token from localStorage
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null
+      
       const response = await fetch(`/api/tasks/${taskData._id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
         body: JSON.stringify(taskData),
       })
       
@@ -70,8 +87,12 @@ export const deleteTask = createAsyncThunk(
   'tasks/deleteTask',
   async (taskId: string, { rejectWithValue }) => {
     try {
+      // Get token from localStorage
+      const token = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null
+      
       const response = await fetch(`/api/tasks/${taskId}`, {
         method: 'DELETE',
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
       })
       
       const data: ApiResponse = await response.json()
@@ -97,9 +118,15 @@ export const moveTask = createAsyncThunk(
     destinationIndex: number
   }, { rejectWithValue }) => {
     try {
+      // Get token from localStorage
+      const token = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null
+      
       const response = await fetch(`/api/tasks/${moveData.taskId}/move`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
         body: JSON.stringify(moveData),
       })
       
@@ -183,20 +210,20 @@ const tasksSlice = createSlice({
           t.columnId === destinationColumnId && t._id !== taskId
         )
         
-        // Update order for affected tasks
+        // Update position for affected tasks
         tasksInSourceColumn.forEach((t, index) => {
           if (index >= action.payload.sourceIndex) {
-            t.order = index
+            t.position = index
           }
         })
         
         tasksInDestColumn.forEach((t, index) => {
           if (index >= destinationIndex) {
-            t.order = index + 1
+            t.position = index + 1
           }
         })
         
-        task.order = destinationIndex
+        task.position = destinationIndex
       }
     },
     rollbackOptimisticMove: (state, action: PayloadAction<string>) => {
@@ -208,7 +235,7 @@ const tasksSlice = createSlice({
         if (task) {
           // Revert task to original column and position
           task.columnId = move.sourceColumnId
-          task.order = move.sourceIndex
+          task.position = move.sourceIndex
         }
         
         state.optimisticMoves.splice(moveIndex, 1)
@@ -341,7 +368,7 @@ const tasksSlice = createSlice({
           const task = state.tasks.find(t => t._id === move.taskId)
           if (task) {
             task.columnId = move.sourceColumnId
-            task.order = move.sourceIndex
+            task.position = move.sourceIndex
           }
         })
         state.optimisticMoves = []

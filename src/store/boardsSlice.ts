@@ -6,7 +6,12 @@ export const fetchBoards = createAsyncThunk(
   'boards/fetchBoards',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await fetch('/api/boards')
+      // Get token from localStorage
+      const token = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null
+      
+      const response = await fetch('/api/boards', {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+      })
       const data: ApiResponse<Board[]> = await response.json()
       
       if (!data.success) {
@@ -24,20 +29,36 @@ export const createBoard = createAsyncThunk(
   'boards/createBoard',
   async (boardData: CreateBoardData, { rejectWithValue }) => {
     try {
+      // Get token from localStorage
+      const token = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null
+      
+      console.log('createBoard: token present:', !!token)
+      console.log('createBoard: sending data:', boardData)
+      
       const response = await fetch('/api/boards', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
         body: JSON.stringify(boardData),
       })
       
       const data: ApiResponse<Board> = await response.json()
       
-      if (!data.success) {
-        return rejectWithValue(data.error || 'Failed to create board')
+      console.log('createBoard: response status:', response.status)
+      console.log('createBoard: response data:', data)
+      
+      if (!response.ok || !data.success) {
+        const error = data.error || 'Failed to create board'
+        console.error('createBoard: error response:', error)
+        return rejectWithValue(error)
       }
       
+      console.log('createBoard: success, board id:', data.data?._id)
       return data.data!
     } catch (error) {
+      console.error('createBoard: network error:', error)
       return rejectWithValue('Network error')
     }
   }
