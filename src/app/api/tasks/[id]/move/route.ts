@@ -10,7 +10,7 @@ function extractUserId(request: NextRequest): string | null {
     if (!token) return null
     
     const decoded = verifyToken(token)
-    return decoded.userId
+    return decoded?.userId || null
   } catch {
     return null
   }
@@ -21,7 +21,7 @@ async function verifyBoardAccess(boardId: string, userId: string): Promise<boole
   const board = await BoardModel.findById(boardId)
   if (!board) return false
   
-  return board.owner.toString() === userId || board.members.some(m => m.toString() === userId)
+  return board.owner.toString() === userId || board.members.some((m: any) => m.toString() === userId)
 }
 
 // PUT - Move a task to a different column/position

@@ -12,8 +12,8 @@ export interface IBoard extends Document {
   _id: string
   title: string
   description?: string
-  owner: string // User ID
-  members?: string[] // User IDs
+  owner: mongoose.Types.ObjectId | string
+  members?: (mongoose.Types.ObjectId | string)[]
   columns: IColumn[]
   createdAt: Date
   updatedAt: Date
@@ -52,13 +52,13 @@ const BoardSchema = new Schema<IBoard>(
       maxlength: [1000, 'Board description cannot exceed 1000 characters'],
     },
     owner: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: 'User',
       required: [true, 'Board owner is required'],
     },
     members: [
       {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'User',
       },
     ],

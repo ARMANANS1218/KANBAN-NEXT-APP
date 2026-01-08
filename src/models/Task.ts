@@ -34,7 +34,7 @@ const TaskSchema = new Schema<ITask>(
       required: [true, 'Column ID is required'],
     },
     boardId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: 'Board',
       required: [true, 'Board ID is required'],
     },
@@ -56,13 +56,13 @@ const TaskSchema = new Schema<ITask>(
     ],
     assignees: [
       {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'User',
       },
     ],
     dueDate: Date,
     createdBy: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: 'User',
       required: true,
     },

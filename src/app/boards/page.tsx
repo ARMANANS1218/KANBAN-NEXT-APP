@@ -39,6 +39,7 @@ export default function BoardsPage() {
       const newBoard = await createBoard({
         title: newBoardTitle.trim(),
         description: '',
+        members: [],
       })
       
       console.log('Board created successfully:', newBoard)

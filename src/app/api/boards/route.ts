@@ -10,7 +10,7 @@ function extractUserId(request: NextRequest): string | null {
     if (!token) return null
     
     const decoded = verifyToken(token)
-    return decoded.userId
+    return decoded?.userId || null
   } catch {
     return null
   }
@@ -35,8 +35,8 @@ export async function GET(request: NextRequest) {
         { members: userId }
       ]
     })
-      .populate('owner', 'name email avatar color')
-      .populate('members', 'name email avatar color')
+      .populate('owner', 'name email avatar color profileImage')
+      .populate('members', 'name email avatar color profileImage')
       .sort({ updatedAt: -1 })
     
     return NextResponse.json({

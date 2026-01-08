@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: kanban-socket-server
+    runtime: node
+    buildCommand: npm install
+    startCommand: node server/socket-server.js
+    envVars:
+      - key: MONGODB_URI
+        sync: false
+      - key: SOCKET_PORT
+        value: 3002
+      - key: FRONTEND_URL
+        value: https://kanban-next-app-alpha.vercel.app

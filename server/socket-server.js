@@ -15,11 +15,20 @@ mongoose.connect(MONGODB_URI)
 // Create HTTP server
 const httpServer = createServer()
 
+// CORS origins - Add your production URLs
+const allowedOrigins = [
+  "http://localhost:3000",
+  "http://127.0.0.1:3000",
+  "https://kanban-next-app-alpha.vercel.app",
+  process.env.FRONTEND_URL, // Add this to your env variables
+].filter(Boolean)
+
 // Create Socket.IO server
 const io = new Server(httpServer, {
   cors: {
-    origin: ["http://localhost:3000", "http://127.0.0.1:3000"],
-    methods: ["GET", "POST"]
+    origin: allowedOrigins,
+    methods: ["GET", "POST"],
+    credentials: true
   }
 })
 
