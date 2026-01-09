@@ -1,4 +1,12 @@
-import mongoose, { Schema, Document, Model } from 'mongoose'
+import mongoose, { Schema, Document, Model, Types } from 'mongoose'
+
+// Interface for Column subdocument
+interface IColumnDoc {
+  title: string
+  position: number
+  createdAt?: Date
+  updatedAt?: Date
+}
 
 export interface IColumn {
   _id: string
@@ -8,18 +16,30 @@ export interface IColumn {
   updatedAt: Date
 }
 
+// Interface for Board document (with ObjectId for database)
+interface IBoardDoc {
+  title: string
+  description?: string
+  owner: Types.ObjectId
+  members?: Types.ObjectId[]
+  columns: IColumnDoc[]
+  createdAt: Date
+  updatedAt: Date
+}
+
+// Interface for the populated/hydrated document (with string for app use)
 export interface IBoard extends Document {
   _id: string
   title: string
   description?: string
-  owner: mongoose.Types.ObjectId | string
-  members?: (mongoose.Types.ObjectId | string)[]
+  owner: Types.ObjectId | string
+  members?: (Types.ObjectId | string)[]
   columns: IColumn[]
   createdAt: Date
   updatedAt: Date
 }
 
-const ColumnSchema = new Schema<IColumn>(
+const ColumnSchema = new Schema<IColumnDoc>(
   {
     title: {
       type: String,
@@ -38,7 +58,7 @@ const ColumnSchema = new Schema<IColumn>(
   }
 )
 
-const BoardSchema = new Schema<IBoard>(
+const BoardSchema = new Schema<IBoardDoc>(
   {
     title: {
       type: String,
@@ -80,7 +100,7 @@ if (mongoose.models.Board) {
   delete mongoose.models.Board
 }
 
-const Board: Model<IBoard> = mongoose.model<IBoard>('Board', BoardSchema)
+const Board = mongoose.model('Board', BoardSchema) as unknown as Model<IBoard>
 
 export { Board }
 export default Board

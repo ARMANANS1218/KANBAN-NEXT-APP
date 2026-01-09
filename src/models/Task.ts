@@ -1,22 +1,39 @@
-import mongoose, { Schema, Document, Model } from 'mongoose'
+import mongoose, { Schema, Document, Model, Types } from 'mongoose'
 
+// Interface for the document (with ObjectId for database)
+interface ITaskDoc {
+  title: string
+  description?: string
+  columnId: string
+  boardId: Types.ObjectId
+  position: number
+  priority?: 'low' | 'medium' | 'high' | 'urgent'
+  tags?: string[]
+  assignees?: Types.ObjectId[]
+  dueDate?: Date
+  createdBy: Types.ObjectId
+  createdAt: Date
+  updatedAt: Date
+}
+
+// Interface for the populated/hydrated document (with string for app use)
 export interface ITask extends Document {
   _id: string
   title: string
   description?: string
   columnId: string
-  boardId: string
+  boardId: Types.ObjectId | string
   position: number
   priority?: 'low' | 'medium' | 'high' | 'urgent'
   tags?: string[]
-  assignees?: string[] // User IDs
+  assignees?: (Types.ObjectId | string)[]
   dueDate?: Date
-  createdBy: string // User ID
+  createdBy: Types.ObjectId | string
   createdAt: Date
   updatedAt: Date
 }
 
-const TaskSchema = new Schema<ITask>(
+const TaskSchema = new Schema<ITaskDoc>(
   {
     title: {
       type: String,
@@ -80,9 +97,9 @@ TaskSchema.index({ createdBy: 1 })
 let Task: Model<ITask>
 
 try {
-  Task = mongoose.model<ITask>('Task')
+  Task = mongoose.model('Task') as unknown as Model<ITask>
 } catch (error) {
-  Task = mongoose.model<ITask>('Task', TaskSchema)
+  Task = mongoose.model('Task', TaskSchema) as unknown as Model<ITask>
 }
 
 export { Task }

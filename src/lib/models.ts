@@ -1,18 +1,62 @@
-import { Schema, model, models, Document } from 'mongoose'
-import { User, Board, Column, Task } from '@/types'
+import { Schema, model, models, Document, Types } from 'mongoose'
+
+// Mongoose document interfaces (using ObjectId)
+interface IUserDoc extends Document {
+  name: string
+  email: string
+  avatar?: string
+  profileImage?: string
+  color: string
+  createdAt: Date
+  updatedAt: Date
+}
+
+interface ITaskDoc extends Document {
+  title: string
+  description?: string
+  priority: 'low' | 'medium' | 'high' | 'urgent'
+  tags: string[]
+  assignees: Types.ObjectId[]
+  columnId: string
+  boardId: Types.ObjectId
+  position: number
+  dueDate?: Date
+  createdBy: Types.ObjectId
+  createdAt: Date
+  updatedAt: Date
+}
+
+interface IColumnDoc {
+  _id: Types.ObjectId
+  title: string
+  position: number
+  createdAt: Date
+  updatedAt: Date
+}
+
+interface IBoardDoc extends Document {
+  title: string
+  description?: string
+  columns: IColumnDoc[]
+  members: Types.ObjectId[]
+  owner: Types.ObjectId
+  createdAt: Date
+  updatedAt: Date
+}
 
 // User Schema
-const userSchema = new Schema<User>({
+const userSchema = new Schema<IUserDoc>({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   avatar: { type: String },
+  profileImage: { type: String },
   color: { type: String, required: true },
 }, {
   timestamps: true,
 })
 
 // Task Schema
-const taskSchema = new Schema<Task>({
+const taskSchema = new Schema<ITaskDoc>({
   title: { type: String, required: true },
   description: { type: String },
   priority: { 
@@ -32,7 +76,7 @@ const taskSchema = new Schema<Task>({
 })
 
 // Column Schema (for embedded documents in Board)
-const columnSchema = new Schema({
+const columnSchema = new Schema<IColumnDoc>({
   title: { type: String, required: true },
   position: { type: Number, required: true, default: 0 },
 }, {
@@ -40,7 +84,7 @@ const columnSchema = new Schema({
 })
 
 // Board Schema
-const boardSchema = new Schema<Board>({
+const boardSchema = new Schema<IBoardDoc>({
   title: { type: String, required: true },
   description: { type: String },
   columns: [columnSchema], // Embedded subdocuments, not references
@@ -70,6 +114,6 @@ if (models.Task) {
 }
 
 // Export models
-export const UserModel = models.User || model<User>('User', userSchema)
-export const TaskModel = models.Task || model<Task>('Task', taskSchema)
-export const BoardModel = models.Board || model<Board>('Board', boardSchema)
+export const UserModel = models.User || model<IUserDoc>('User', userSchema)
+export const TaskModel = models.Task || model<ITaskDoc>('Task', taskSchema)
+export const BoardModel = models.Board || model<IBoardDoc>('Board', boardSchema)
