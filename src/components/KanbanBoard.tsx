@@ -57,6 +57,8 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ boardId }) => {
 
   // Load board and tasks on mount
   useEffect(() => {
+    let isMounted = true
+    
     const loadBoardData = async () => {
       try {
         // First, try to get the board from the store
@@ -65,25 +67,37 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ boardId }) => {
         // If not found, load all boards first
         if (!board) {
           await loadBoards()
+          if (!isMounted) return // Check if component is still mounted
           board = getBoardById(boardId)
         }
         
         // If we found the board, select it and load tasks
-        if (board) {
+        if (board && isMounted) {
           selectBoard(board)
-          loadTasks(boardId)
-        } else {
+          // Load tasks in background (non-blocking)
+          setTimeout(() => {
+            if (isMounted) {
+              loadTasks(boardId)
+            }
+          }, 0)
+        } else if (isMounted) {
           console.error(`Board with ID ${boardId} not found`)
           toast.error('Board not found. Redirecting to boards list...')
           setTimeout(() => router.push('/boards'), 2000)
         }
       } catch (error) {
-        console.error('Error loading board data:', error)
+        if (isMounted) {
+          console.error('Error loading board data:', error)
+        }
       }
     }
     
     loadBoardData()
-  }, [boardId, getBoardById, selectBoard, loadTasks, loadBoards])
+    
+    return () => {
+      isMounted = false
+    }
+  }, [boardId, getBoardById, selectBoard, loadTasks, loadBoards, router])
 
   // Handle drag end - optimized with useCallback
   const handleDragEnd = useCallback(async (result: DropResult) => {
