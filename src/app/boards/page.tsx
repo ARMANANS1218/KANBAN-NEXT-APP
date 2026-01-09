@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAppSelector } from '@/store'
 import { useBoards } from '@/hooks/useBoards'
@@ -16,14 +16,19 @@ export default function BoardsPage() {
   const { boards, isLoading, createBoard, loadBoards } = useBoards()
   const [newBoardTitle, setNewBoardTitle] = useState('')
   const [isCreating, setIsCreating] = useState(false)
+  const [hasLoadedBoards, setHasLoadedBoards] = useState(false)
+
+  // Memoize authentication check
+  const shouldRedirect = useMemo(() => !isAuthenticated, [isAuthenticated])
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (shouldRedirect) {
       router.push('/auth/login')
-    } else {
+    } else if (!hasLoadedBoards && isAuthenticated) {
+      setHasLoadedBoards(true)
       loadBoards()
     }
-  }, [isAuthenticated, router, loadBoards])
+  }, [shouldRedirect, isAuthenticated, router, loadBoards, hasLoadedBoards])
 
   const handleCreateBoard = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -61,6 +66,21 @@ export default function BoardsPage() {
 
   if (!isAuthenticated) {
     return null
+  }
+
+  // Show loading state while boards are being fetched
+  if (isLoading && boards.length === 0) {
+    return (
+      <div>
+        <Navbar />
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center">
+          <div className="text-center">
+            <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto mb-4" />
+            <p className="text-muted-foreground">Loading your boards...</p>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
