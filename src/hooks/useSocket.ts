@@ -27,7 +27,7 @@ export const useSocket = (boardId?: string) => {
     const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3002'
     console.log('Connecting to socket server at:', socketUrl)
 
-    // Initialize socket connection
+    // Initialize socket connection with optimized settings
     socketRef.current = io(socketUrl, {
       query: {
         userId: currentUser._id,
@@ -36,7 +36,14 @@ export const useSocket = (boardId?: string) => {
       reconnection: true,
       reconnectionAttempts: 5,
       reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+      timeout: 10000,
       transports: ['websocket', 'polling'],
+      upgrade: true,
+      rememberUpgrade: true,
+      // Optimize for performance
+      forceNew: false,
+      multiplex: true,
     })
 
     const socket = socketRef.current
@@ -52,16 +59,22 @@ export const useSocket = (boardId?: string) => {
 
     socket.on('disconnect', (reason) => {
       console.warn('⚠️ Socket disconnected:', reason)
+      // Only log, don't show UI notification to avoid spam
     })
 
     socket.on('reconnect', (attemptNumber) => {
       console.log('🔄 Socket reconnected after', attemptNumber, 'attempts')
     })
 
-    // Join board room if boardId is provided
+    // Join board room if boardId is provided (with debounce)
     if (boardId) {
-      socket.emit('join-board', { boardId, userId: currentUser._id })
-      console.log('Joining board room:', boardId)
+      // Small delay to batch join requests
+      const joinTimer = setTimeout(() => {
+        socket.emit('join-board', { boardId, userId: currentUser._id })
+        console.log('Joining board room:', boardId)
+      }, 100)
+      
+      return () => clearTimeout(joinTimer)
     }
 
     // Task events
